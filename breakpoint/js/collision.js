@@ -44,7 +44,6 @@ export function handlePaddleCollision(ball, paddle) {
 
 export function handleBrickCollision(ball, brickField) {
   for (const brick of brickField.bricks) {
-    if (!brick.alive) continue;
     // simple AABB collision for circle vs rect
     const distX = Math.abs(ball.x - (brick.x + brick.width / 2));
     const distY = Math.abs(ball.y - (brick.y + brick.height / 2));
@@ -52,8 +51,8 @@ export function handleBrickCollision(ball, brickField) {
     if (distX > brick.width / 2 + ball.radius) continue;
     if (distY > brick.height / 2 + ball.radius) continue;
 
-    // collision detected
-    brick.alive = false;
+    // collision detected: apply damage but never remove the brick
+    const points = brick.hit(10);
 
     // reflect ball based on side
     if (distX <= brick.width / 2) {
@@ -65,7 +64,7 @@ export function handleBrickCollision(ball, brickField) {
       ball.vy *= -1;
     }
 
-    return brick.points;
+    return points;
   }
   return 0;
 }
