@@ -1,37 +1,62 @@
-// UI module: score, lives, and progress HUD
+// UI module: score, lives, and menu screens
 export class UI {
-  constructor() {
+  constructor(ctx, canvas) {
+    this.ctx = ctx;
+    this.canvas = canvas;
     this.score = 0;
     this.lives = 3;
-
-    this.scoreEl = document.getElementById('scoreValue');
-    this.livesEl = document.getElementById('livesValue');
-    this.progressFillEl = document.getElementById('progressFill');
-    this.progressTextEl = document.getElementById('progressText');
-
-    this.updateHud(this.score, this.lives);
-    this.updateProgress(0, 96);
+    this.activeScreen = 'start'; // start, playing, gameover, victory
   }
 
-  getLivesText(lives) {
-    const heartCount = Math.max(0, lives);
-    const hearts = Array.from({ length: heartCount }, () => '❤️').join(' ');
-    return hearts ? `LIVES ${hearts}` : 'LIVES';
+  setScore(s) { this.score = s; this._updateDom(); }
+  setLives(l) { this.lives = l; this._updateDom(); }
+
+  _updateDom() {
+    const s = document.getElementById('score');
+    const l = document.getElementById('lives');
+    if (s) s.textContent = `Score: ${this.score}`;
+    if (l) l.textContent = `Lives: ${this.lives}`;
   }
 
-  updateHud(score, lives) {
-    this.score = score;
-    this.lives = lives;
-
-    if (this.scoreEl) this.scoreEl.textContent = `SCORE ${this.score}`;
-    if (this.livesEl) this.livesEl.textContent = this.getLivesText(this.lives);
+  drawStart() {
+    const ctx = this.ctx;
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(120, 120, this.canvas.width - 240, 240);
+    ctx.fillStyle = '#fff';
+    ctx.font = '36px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('BreakPoint', this.canvas.width / 2, 200);
+    ctx.font = '18px Arial';
+    ctx.fillText('Arrow keys to move — Press Space to Start', this.canvas.width / 2, 260);
+    ctx.restore();
   }
 
-  updateProgress(destroyed, total) {
-    const safeTotal = Math.max(total, 1);
-    const percentage = Math.round((destroyed / safeTotal) * 100);
+  drawGameOver() {
+    const ctx = this.ctx;
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(120, 120, this.canvas.width - 240, 200);
+    ctx.fillStyle = '#fff';
+    ctx.font = '32px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Game Over', this.canvas.width / 2, 220);
+    ctx.font = '18px Arial';
+    ctx.fillText('Press Space to Restart', this.canvas.width / 2, 260);
+    ctx.restore();
+  }
 
-    if (this.progressFillEl) this.progressFillEl.style.width = `${percentage}%`;
-    if (this.progressTextEl) this.progressTextEl.textContent = `${percentage}%`;
+  drawVictory() {
+    const ctx = this.ctx;
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(120, 120, this.canvas.width - 240, 200);
+    ctx.fillStyle = '#fff';
+    ctx.font = '32px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('You Win!', this.canvas.width / 2, 220);
+    ctx.font = '18px Arial';
+    ctx.fillText('Press Space to Play Again', this.canvas.width / 2, 260);
+    ctx.restore();
   }
 }
