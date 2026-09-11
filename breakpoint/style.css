@@ -11,3 +11,12 @@ canvas{background:#000;border:2px solid #333;display:block}
 
 /* Responsive tweak */
 @media (max-width:840px){canvas{width:100%;height:auto}}
+
+/* Progress bar and stats */
+#progress-wrap{display:flex;flex-direction:column;align-items:flex-start;background:rgba(0,0,0,0.35);padding:6px;border-radius:6px}
+#progress{width:180px;height:12px;background:#222;border-radius:6px;margin-top:6px;overflow:hidden}
+#progress-bar{height:100%;background:linear-gradient(90deg,#32d74b,#ffd166);width:0%}
+#progress-label{font-size:12px;opacity:0.9}
+
+/* Screen shake helper (canvas transform will handle) */
+
