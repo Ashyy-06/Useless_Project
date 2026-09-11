@@ -1,20 +1,44 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>BreakPoint</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <div id="game-container">
-      <canvas id="game-canvas" width="800" height="600"></canvas>
-      <div id="hud">
-        <div id="score">Score: 0</div>
-        <div id="lives">Lives: 3</div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BreakPoint</title>
+  <link rel="icon" href="favicon.png" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="game-shell">
+    <div id="hud" class="hud" aria-live="polite">
+      <div class="hud-top">
+        <div class="brand">BreakPoint</div>
+        <div class="hud-stats">
+          <span id="scoreValue">SCORE 0</span>
+          <span id="livesValue">LIVES ❤️ ❤️ ❤️</span>
+        </div>
+      </div>
+      <div class="progress-panel">
+        <div class="progress-header">
+          <span>PROGRESS</span>
+          <span id="progressText">0%</span>
+        </div>
+        <div class="progress-track">
+          <div id="progressFill" class="progress-fill"></div>
+        </div>
       </div>
     </div>
 
-    <script type="module" src="js/game.js"></script>
-  </body>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+    <div id="startOverlay" class="overlay">
+      <h1 id="overlayTitle">BreakPoint</h1>
+      <p id="overlayMessage">Break every brick. Keep the ball alive.</p>
+      <button id="startBtn">START GAME</button>
+      <p>Use ← → to move the paddle</p>
+    </div>
+  </div>
+
+  <script type="module" src="js/game.js"></script>
+</body>
 </html>

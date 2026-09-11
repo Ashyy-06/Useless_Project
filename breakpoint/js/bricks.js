@@ -1,56 +1,105 @@
-// Bricks module: generate bricks grid, render, and removal
-export class Brick {
-  constructor(x, y, width, height, points = 10) {
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-    this.alive = true;
-    this.points = points;
-  }
+// js/bricks.js
+// Generates a grid of bricks with colorful rows.
 
-  draw(ctx) {
-    if (!this.alive) return;
-    ctx.fillStyle = '#ff6b6b';
-    ctx.fillRect(this.x, this.y, this.width, this.height);
-    ctx.strokeStyle = 'rgba(0,0,0,0.4)';
-    ctx.strokeRect(this.x, this.y, this.width, this.height);
-  }
-}
-
-export class BrickField {
-  constructor(cols = 10, rows = 5, canvasWidth = 800) {
-    this.cols = cols;
-    this.rows = rows;
-    this.canvasWidth = canvasWidth;
-    this.bricks = [];
-    this.padding = 8;
+export class Bricks {
+  constructor(canvasWidth, canvasHeight) {
+    this.rows = 8; // increased from 5
+    this.cols = 12; // increased from 10
+    this.padding = 4; // space between bricks
     this.offsetTop = 60;
-    this.offsetLeft = 40;
-    this._generate();
+    this.offsetLeft = 30;
+    this.brickWidth = Math.floor((canvasWidth - this.offsetLeft * 2 - (this.cols - 1) * this.padding) / this.cols);
+    this.brickHeight = 20;
+    this.colors = [
+      '#ff5555', // red
+      '#ff7f00', // orange
+      '#ffff55', // yellow
+      '#7fff00', // green
+      '#55ffff', // cyan
+      '#5555ff', // blue
+      '#7f00ff', // purple
+      '#ff55ff', // pink
+    ];
+    this.grid = [];
+    this.totalBricks = this.rows * this.cols;
+    this.destroyedBricks = 0;
+    this.createGrid();
   }
 
-  _generate() {
-    this.bricks = [];
-    const totalPaddingX = this.padding * (this.cols - 1);
-    const availableWidth = this.canvasWidth - this.offsetLeft * 2 - totalPaddingX;
-    const brickWidth = Math.floor(availableWidth / this.cols);
-    const brickHeight = 20;
-
+  createGrid() {
     for (let r = 0; r < this.rows; r++) {
+      const row = [];
+      const color = this.colors[r % this.colors.length];
       for (let c = 0; c < this.cols; c++) {
-        const x = this.offsetLeft + c * (brickWidth + this.padding);
-        const y = this.offsetTop + r * (brickHeight + this.padding);
-        this.bricks.push(new Brick(x, y, brickWidth, brickHeight, 10));
+        const brick = {
+          x: this.offsetLeft + c * (this.brickWidth + this.padding),
+          y: this.offsetTop + r * (this.brickHeight + this.padding),
+          width: this.brickWidth,
+          height: this.brickHeight,
+          broken: false,
+          color: color,
+        };
+        row.push(brick);
       }
+      this.grid.push(row);
     }
   }
 
-  draw(ctx) {
-    this.bricks.forEach((b) => b.draw(ctx));
+  reset() {
+    this.grid = [];
+    this.destroyedBricks = 0;
+    this.createGrid();
   }
 
-  getAliveCount() {
-    return this.bricks.filter((b) => b.alive).length;
+  draw(ctx) {
+    ctx.save();
+    for (const row of this.grid) {
+      for (const brick of row) {
+        if (!brick.broken) {
+          ctx.fillStyle = brick.color;
+          ctx.fillRect(brick.x, brick.y, brick.width, brick.height);
+          // subtle border/shadow for depth
+          ctx.strokeStyle = '#00000020';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(brick.x, brick.y, brick.width, brick.height);
+        }
+      }
+    }
+    ctx.restore();
+  }
+
+  // Returns the first brick that collides with the given rect, or null.
+  checkCollision(rect) {
+    for (const row of this.grid) {
+      for (const brick of row) {
+        if (brick.broken) continue;
+        if (
+          rect.x < brick.x + brick.width &&
+          rect.x + rect.width > brick.x &&
+          rect.y < brick.y + brick.height &&
+          rect.y + rect.height > brick.y
+        ) {
+          return brick;
+        }
+      }
+    }
+    return null;
+  }
+
+  // Marks a brick as broken.
+  breakBrick(brick) {
+    if (!brick || brick.broken) return false;
+    brick.broken = true;
+    this.destroyedBricks += 1;
+    return true;
+  }
+
+  getDestroyedCount() {
+    return this.destroyedBricks;
+  }
+
+  // Check if all bricks are broken.
+  isCleared() {
+    return this.destroyedBricks >= this.totalBricks;
   }
 }
